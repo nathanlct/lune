@@ -9,7 +9,8 @@
 
 
 struct Wrapper {
-    float (*function)(float); 
+    std::function<float(float,float)> function;
+    float frequency;
 };
 
 static float elapsedTime = 0.0f;
@@ -22,6 +23,8 @@ void write_callback(struct SoundIoOutStream *outstream, int frameCountMin, int f
     float secondsPerFrame = 1.0f / outstream->sample_rate;
     int framesLeft = frameCountMax;
 
+    float frequency = ((Wrapper*)outstream->userdata)->frequency;
+
     while (framesLeft > 0) {
         int frameCount = framesLeft;
         soundio_outstream_begin_write(outstream, &areas, &frameCount);
@@ -30,7 +33,7 @@ void write_callback(struct SoundIoOutStream *outstream, int frameCountMin, int f
             break;
 
         for (int frame = 0; frame < frameCount; frame += 1) {
-            float sample = ((Wrapper*)outstream->userdata)->function(elapsedTime);
+            float sample = ((Wrapper*)outstream->userdata)->function(elapsedTime, frequency);
             elapsedTime += secondsPerFrame;
             for (int channel = 0; channel < layout->channel_count; channel += 1) {
                 float *ptr = (float*)(areas[channel].ptr + areas[channel].step * frame);
@@ -63,6 +66,7 @@ public:
         soundio_outstream_open(outstream);
         soundio_outstream_pause(outstream, true);
         soundio_outstream_start(outstream);
+        soundio_outstream_pause(outstream, true);
     }
 
     ~SoundMaker() {
@@ -72,7 +76,7 @@ public:
     }
 
 public:
-    void setSoundFunction(float (*getAmplitude)(float)) {
+    void setSoundFunction(std::function<float(float,float)> getAmplitude) {
         if (getAmplitude == nullptr) {
             soundio_outstream_pause(outstream, true);
         }
@@ -80,6 +84,9 @@ public:
             ((Wrapper*)outstream->userdata)->function = getAmplitude;
             soundio_outstream_pause(outstream, false);
         }        
+    }
+    void setSoundFrequency(float frequency) {
+        ((Wrapper*)outstream->userdata)->frequency = frequency;              
     }
 
 private:
