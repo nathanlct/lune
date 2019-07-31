@@ -10,15 +10,17 @@
 #include "SoundInterface.hpp"
 
 
-float elapsed_time = 0.0f;
+double elapsed_time = 0.0;
 
 void write_callback(struct SoundIoOutStream *outstream, int frame_count_min, int frame_count_max) 
 {
     const struct SoundIoChannelLayout *layout = &outstream->layout;
     struct SoundIoChannelArea *areas;
 
-    float seconds_per_frame = 1.0f / outstream->sample_rate;
+    double seconds_per_frame = 1.0 / outstream->sample_rate; // ?? 44100Hz?
     int frames_left = frame_count_max;
+
+    // printf("%d %i %i\n", outstream->sample_rate, frame_count_min, frame_count_max);
 
     while (frames_left > 0) {
         int frame_count = frames_left;
@@ -28,7 +30,7 @@ void write_callback(struct SoundIoOutStream *outstream, int frame_count_min, int
             break;
 
         for (int frame = 0; frame < frame_count; frame += 1) {
-            float elapsed = elapsed_time + frame * seconds_per_frame;
+            double elapsed = elapsed_time + (double)frame * seconds_per_frame;
             float sample = ((SoundInterface*)outstream->userdata)->get_sample(elapsed);
 
             for (int channel = 0; channel < layout->channel_count; channel += 1) {
@@ -37,7 +39,7 @@ void write_callback(struct SoundIoOutStream *outstream, int frame_count_min, int
             }
         }
 
-        elapsed_time = fmod(elapsed_time + frame_count * seconds_per_frame, 1.0);
+        elapsed_time += frame_count * seconds_per_frame;
 
         soundio_outstream_end_write(outstream);
         frames_left -= frame_count;

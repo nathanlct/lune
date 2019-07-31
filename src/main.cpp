@@ -5,7 +5,9 @@
 #include <cmath>
 
 #include "SoundIOBridge.hpp"
+#include "InstrumentSound.hpp"
 #include "SoundInterface.hpp"
+#include "SineWaveInstrument.hpp"
 
 
 void sleep(long long ms) {
@@ -42,40 +44,39 @@ std::function<double(float,float)> getBasicWave(int type, float max_amplitude = 
     };
 }
 
+
 int main() {
     SoundInterface* sound_interface = new SoundInterface();
     SoundIOBridge sound_io_bridge(sound_interface);
 
-    sleep(5000);
-    
+    SineWaveInstrument sine;
 
-    // sound.setSoundFunction(getSquareWave(0.01));
-    // sound.setSoundFunction(getBasicWave(0));
+    auto X = [](float n){ return pow(2, (n - 10) / 12) * 440; };
 
+    while(true) {
+        std::vector<float> frequencies;
 
-    // float f = 0;
-    // while (true) {
-    //     float m = 1;
-    //     float f = 0;
-    //     auto X = [](float n){return pow(2, (n - 10) / 12) * 440;};
-    //     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) f += X(1);  // C
-    //     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z)) f += X(2);  // C#
-    //     if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) f += X(3);  // D
-    //     if (sf::Keyboard::isKeyPressed(sf::Keyboard::E)) f += X(4);  // D#
-    //     if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) f += X(5);  // E
-    //     if (sf::Keyboard::isKeyPressed(sf::Keyboard::F)) f += X(6);  // F
-    //     if (sf::Keyboard::isKeyPressed(sf::Keyboard::T)) f += X(7);  // F#
-    //     if (sf::Keyboard::isKeyPressed(sf::Keyboard::G)) f += X(8);  // G
-    //     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Y)) f += X(9);  // G#
-    //     if (sf::Keyboard::isKeyPressed(sf::Keyboard::H)) f += X(10); // A
-    //     if (sf::Keyboard::isKeyPressed(sf::Keyboard::U)) f += X(11); // A#
-    //     if (sf::Keyboard::isKeyPressed(sf::Keyboard::J)) f += X(12); // B
-    //     if (sf::Keyboard::isKeyPressed(sf::Keyboard::K)) f += X(13); // C
-    //     else m = 0;
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) frequencies.push_back(X(1));  // C
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z)) frequencies.push_back(X(2));  // C#
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) frequencies.push_back(X(3));  // D
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::E)) frequencies.push_back(X(4));  // D#
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) frequencies.push_back(X(5));  // E
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::F)) frequencies.push_back(X(6));  // F
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::T)) frequencies.push_back(X(7));  // F#
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::G)) frequencies.push_back(X(8));  // G
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Y)) frequencies.push_back(X(9));  // G#
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::H)) frequencies.push_back(X(10)); // A
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::U)) frequencies.push_back(X(11)); // A#
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::J)) frequencies.push_back(X(12)); // B
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::K)) frequencies.push_back(X(13)); // C
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::L)) frequencies.push_back(X(15)); // D
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::M)) frequencies.push_back(X(17)); // E
+        
+        for(auto f:frequencies)
+            sound_interface->sounds.push_back(sine.getSound(f));
 
-    //     sound.setSoundFrequency(f);
-    //     sleep(30);
-    // }
+        sleep(100);
+    }
 
     return 0;
 }

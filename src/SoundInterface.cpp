@@ -1,8 +1,14 @@
 #include "SoundInterface.hpp"
 
 
-float SoundInterface::get_sample(float elapsed) {
+
+float SoundInterface::get_sample(double elapsed) {
     float amplitude = 0.3f;
-    float frequency = 400.0f;
-    return amplitude * sin(2 * M_PI * frequency * elapsed);
+    float sample = 0.0f;
+
+    for(auto& sound: sounds) {
+        sample += amplitude * sound.getSample(elapsed);
+    }
+
+    return sample;
 }
