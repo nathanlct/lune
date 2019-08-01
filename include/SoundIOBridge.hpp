@@ -6,6 +6,7 @@
 #include <cstring>
 #include <cmath>
 #include <iostream>
+#include <chrono>
 
 #include "SoundInterface.hpp"
 
@@ -22,6 +23,9 @@ void write_callback(struct SoundIoOutStream *outstream, int frame_count_min, int
 
     // printf("%d %i %i\n", outstream->sample_rate, frame_count_min, frame_count_max);
 
+
+    auto begin = std::chrono::high_resolution_clock::now();
+
     while (frames_left > 0) {
         int frame_count = frames_left;
         soundio_outstream_begin_write(outstream, &areas, &frame_count);
@@ -31,6 +35,7 @@ void write_callback(struct SoundIoOutStream *outstream, int frame_count_min, int
 
         for (int frame = 0; frame < frame_count; frame += 1) {
             double elapsed = elapsed_time + (double)frame * seconds_per_frame;
+
             float sample = ((SoundInterface*)outstream->userdata)->get_sample(elapsed);
 
             for (int channel = 0; channel < layout->channel_count; channel += 1) {
@@ -44,6 +49,21 @@ void write_callback(struct SoundIoOutStream *outstream, int frame_count_min, int
         soundio_outstream_end_write(outstream);
         frames_left -= frame_count;
     }
+
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end-begin).count();
+
+    if(duration > 10000000) std::cout << "TOO SLOW\n";
+    // std::cout << duration << " ns for " << frame_count_max << " frames" << std::endl;
+    // std::cout << 
+    // 44100 Hz - 512 frames in write_callback - write_callback called 86 times per second
+    // max time in function: 1/86 s = 11'627'906 ns
+    // keeps accumulating -> need to empty vector when sound is over
+    // but this is not the cause of the pb
+    // if too slow we have grésillements
+    // here its not grésillements
+
+    
 }
 
 class SoundIOBridge {
