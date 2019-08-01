@@ -51,31 +51,51 @@ int main() {
 
     SineWaveInstrument sine;
 
+    std::vector<float> frequencies;
     auto X = [](float n){ return pow(2, (n - 10) / 12) * 440; };
 
-    while(true) {
-        std::vector<float> frequencies;
+    sf::Window window(sf::VideoMode(800, 600), "Lune");
+    window.setKeyRepeatEnabled(false);
 
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) frequencies.push_back(X(1));  // C
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z)) frequencies.push_back(X(2));  // C#
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) frequencies.push_back(X(3));  // D
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::E)) frequencies.push_back(X(4));  // D#
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) frequencies.push_back(X(5));  // E
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::F)) frequencies.push_back(X(6));  // F
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::T)) frequencies.push_back(X(7));  // F#
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::G)) frequencies.push_back(X(8));  // G
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Y)) frequencies.push_back(X(9));  // G#
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::H)) frequencies.push_back(X(10)); // A
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::U)) frequencies.push_back(X(11)); // A#
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::J)) frequencies.push_back(X(12)); // B
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::K)) frequencies.push_back(X(13)); // C
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::L)) frequencies.push_back(X(15)); // D
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::M)) frequencies.push_back(X(17)); // E
-        
-        for(auto f:frequencies)
-            sound_interface->sounds.push_back(sine.getSound(f));
-
-        sleep(100);
+    while(window.isOpen())
+    {
+        sf::Event event;
+        while(window.pollEvent(event))
+        {
+            switch(event.type) {
+                case sf::Event::Closed:
+                    window.close();
+                    break;
+                case sf::Event::KeyPressed:
+                {
+                    float freq = 0;
+                    switch(event.key.code) {
+                        case sf::Keyboard::Q: freq = X(1); break;
+                        case sf::Keyboard::Z: freq = X(2); break;
+                        case sf::Keyboard::S: freq = X(3); break;
+                        case sf::Keyboard::E: freq = X(4); break;
+                        case sf::Keyboard::D: freq = X(5); break;
+                        case sf::Keyboard::F: freq = X(6); break;
+                        case sf::Keyboard::T: freq = X(7); break;
+                        case sf::Keyboard::G: freq = X(8); break;
+                        case sf::Keyboard::Y: freq = X(9); break;
+                        case sf::Keyboard::H: freq = X(10); break;
+                        case sf::Keyboard::U: freq = X(11); break;
+                        case sf::Keyboard::J: freq = X(12); break;
+                        case sf::Keyboard::K: freq = X(13); break;
+                        case sf::Keyboard::O: freq = X(14); break;
+                        case sf::Keyboard::L: freq = X(15); break;
+                        case sf::Keyboard::P: freq = X(16); break;
+                        case sf::Keyboard::M: freq = X(17); break;
+                        default: break;
+                    }
+                    if(freq > 0)
+                        sound_interface->sounds.push_back(sine.getSound(freq));
+                    break;
+                }
+                default: break;
+            }
+        }
     }
 
     return 0;

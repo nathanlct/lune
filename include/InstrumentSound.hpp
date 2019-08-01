@@ -18,7 +18,7 @@ public:
 private:
     float attackTime = 0.05;
     float decayTime = 0.05;
-    float sustainTime = 2.0;
+    float sustainTime = 0.1;
     float releaseTime = 0.075;
     float attackAmplitude = 0.5f;
     float sustainAmplitude = 0.1f;
